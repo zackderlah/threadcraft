@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { auth } from '@/auth'
 
 const DEMO_TWEETS = [
   {
@@ -71,7 +72,10 @@ const FEATURES = [
   },
 ]
 
-export default function LandingPage() {
+export default async function LandingPage() {
+  const session = await auth()
+  const isSignedIn = !!session?.user
+
   return (
     <div className="lp-root">
       {/* ── NAV ─────────────────────────────────────────────── */}
@@ -80,9 +84,27 @@ export default function LandingPage() {
           <div className="logo-dot" />
           ThreadCraft
         </div>
-        <Link href="/generate" className="lp-nav-cta">
-          Try free →
-        </Link>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
+          {isSignedIn ? (
+            <>
+              <span style={{ fontSize: '13px', color: 'var(--text3)', fontFamily: 'var(--mono)' }}>
+                {session.user?.name ?? session.user?.email}
+              </span>
+              <Link href="/generate" className="lp-nav-cta">
+                Open app →
+              </Link>
+            </>
+          ) : (
+            <>
+              <Link href="/auth/signin" style={{ fontSize: '13px', color: 'var(--text2)', textDecoration: 'none' }}>
+                Sign in
+              </Link>
+              <Link href="/generate" className="lp-nav-cta">
+                Try free →
+              </Link>
+            </>
+          )}
+        </div>
       </nav>
 
       {/* ── HERO ────────────────────────────────────────────── */}
