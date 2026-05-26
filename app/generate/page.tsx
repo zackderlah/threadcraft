@@ -36,6 +36,7 @@ export default async function GeneratePage() {
       isPro={isPro}
       userName={session.user.name ?? null}
       userImage={session.user.image ?? null}
+      userEmail={session.user.email ?? null}
     />
   )
 }

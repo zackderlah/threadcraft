@@ -67,9 +67,9 @@ const PRO_FEATURES = [
   'Early access to new features',
 ]
 
-const STRIPE_URL = '#'
+const STRIPE_PAYMENT_LINK = process.env.NEXT_PUBLIC_STRIPE_PAYMENT_LINK ?? '#'
 
-function UpgradeModal({ onClose, isPro }: { onClose: () => void; isPro: boolean }) {
+function UpgradeModal({ onClose, isPro, stripeUrl }: { onClose: () => void; isPro: boolean; stripeUrl: string }) {
   const handleOverlayClick = (e: React.MouseEvent<HTMLDivElement>) => {
     if (e.target === e.currentTarget) onClose()
   }
@@ -112,8 +112,8 @@ function UpgradeModal({ onClose, isPro }: { onClose: () => void; isPro: boolean 
             </ul>
             <a
               className="tile-cta tile-cta-solid"
-              href={STRIPE_URL}
-              onClick={STRIPE_URL === '#' ? (e) => e.preventDefault() : undefined}
+              href={stripeUrl}
+              onClick={stripeUrl === '#' ? (e) => e.preventDefault() : undefined}
             >
               Go Pro →
             </a>
@@ -239,9 +239,10 @@ interface Props {
   isPro: boolean
   userName: string | null
   userImage: string | null
+  userEmail: string | null
 }
 
-export default function ThreadCraftApp({ initialUsage, isPro, userName, userImage }: Props) {
+export default function ThreadCraftApp({ initialUsage, isPro, userName, userImage, userEmail }: Props) {
   const [content, setContent] = useState('')
   const [tone, setTone] = useState<Tone>('informative')
   const [length, setLength] = useState<Length>('medium')
@@ -252,6 +253,11 @@ export default function ThreadCraftApp({ initialUsage, isPro, userName, userImag
   const [showActions, setShowActions] = useState(false)
   const [usageCount, setUsageCount] = useState(initialUsage)
   const monthlyLimit = isPro ? MAX_PRO : MAX_FREE
+
+  // Build Stripe URL with pre-filled email so customers don't have to type it
+  const stripeUrl = STRIPE_PAYMENT_LINK !== '#' && userEmail
+    ? `${STRIPE_PAYMENT_LINK}?prefilled_email=${encodeURIComponent(userEmail)}`
+    : STRIPE_PAYMENT_LINK
   const [contentShake, setContentShake] = useState(false)
   const [showUpgrade, setShowUpgrade] = useState(false)
   const [toastMsg, setToastMsg] = useState('')
@@ -410,7 +416,7 @@ export default function ThreadCraftApp({ initialUsage, isPro, userName, userImag
           {isPro ? (
             <span className="nav-pill nav-pill-pro">PRO</span>
           ) : (
-            <button className="nav-btn" onClick={() => setShowUpgrade(true)}>Go Pro ↗</button>
+            <a className="nav-btn" href={stripeUrl} onClick={stripeUrl === '#' ? (e) => e.preventDefault() : undefined}>Go Pro ↗</a>
           )}
           <button
             className="nav-btn nav-btn-ghost"
@@ -636,7 +642,7 @@ export default function ThreadCraftApp({ initialUsage, isPro, userName, userImag
 
       <div className={`toast${toastVisible ? ' show' : ''}`}>{toastMsg}</div>
 
-      {showUpgrade && <UpgradeModal onClose={() => setShowUpgrade(false)} isPro={isPro} />}
+      {showUpgrade && <UpgradeModal onClose={() => setShowUpgrade(false)} isPro={isPro} stripeUrl={stripeUrl} />}
     </>
   )
 }
