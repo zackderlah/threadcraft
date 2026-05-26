@@ -1,5 +1,6 @@
 import type { Metadata } from 'next'
 import { SessionProvider } from 'next-auth/react'
+import NextTopLoader from 'nextjs-toploader'
 import './globals.css'
 
 export const metadata: Metadata = {
@@ -19,6 +20,12 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         />
       </head>
       <body>
+        <NextTopLoader
+          color="#88C0D0"
+          shadow="0 0 10px #88C0D0,0 0 5px #88C0D0"
+          height={2}
+          showSpinner={false}
+        />
         <SessionProvider>{children}</SessionProvider>
       </body>
     </html>
