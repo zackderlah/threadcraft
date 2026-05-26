@@ -414,7 +414,10 @@ export default function ThreadCraftApp({ initialUsage, isPro, userName, userImag
             {usageCount} / {monthlyLimit} threads
           </span>
           {isPro ? (
-            <span className="nav-pill nav-pill-pro">PRO</span>
+            <>
+              <span className="nav-pill nav-pill-pro">PRO</span>
+              <a className="nav-btn nav-btn-ghost" href="/api/stripe/portal">Manage plan</a>
+            </>
           ) : (
             <a className="nav-btn" href={stripeUrl} onClick={stripeUrl === '#' ? (e) => e.preventDefault() : undefined}>Go Pro ↗</a>
           )}
